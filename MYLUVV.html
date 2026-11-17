@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Our memories &lt;3</title>
+  <style>
+    @font-face {
+      font-family: 'dargirl';
+      src: url('DarlingGirlDemoRegular.ttf');
+    }
+
+    @font-face {
+      font-family: 'mgf';
+      src: url(MGF-PinlockPersonalUse.otf);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes headerPopOut {
+      0% {
+        opacity: 0;
+        transform: translateY(-24px) scale(0.98);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes dropIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes popCardIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      padding-top: 105px;
+      padding-bottom: 80px;
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(15deg, #619DC6, #A6C8E2, #9FA0FF, #23d5ab);
+      background-size: 175% 175%;
+      animation: gradientMove 15s ease infinite;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      color: #2D2638;
+    }
+
+    header {
+      background: linear-gradient(45deg, #619DC6, #B26CFF, #FF6082);
+      position: fixed;
+      background-size: 400% 400%;
+      height: 76px;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      transition: 0.4s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 6px;
+      box-shadow: 0 4px 20px rgba(31, 38, 135, 0.12);
+      animation: headerPopOut 1s cubic-bezier(0.22, 1, 0.36, 1) 0.25s forwards;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    header h1 {
+      font-family: 'dargirl', sans-serif;
+      color: white;
+      margin: 0;
+      font-size: 31px;
+    }
+
+    header:hover {
+      height: 70px;
+      background-position: 100% 50%;
+      box-shadow: 0 4px 24px rgba(255, 96, 130, 0.35);
+    }
+
+    header:hover .falling-text {
+      gap: 3px;
+    }
+
+    header:hover .yu {
+      background: linear-gradient(45deg, #FFF4DE, #FFDDDD, #FFCED8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .falling-text {
+      font-weight: bold;
+      display: flex;
+      gap: 0px;
+      transition: gap 0.4s ease;
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+    }
+    
+    .falling-text span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(-60px);
+      animation: dropIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+      animation-delay: calc(var(--i) * 0.1s);
+      transition: color 0.3s ease;
+    }
+
+    .love-banner {
+      text-align: center;
+      font-family: 'dargirl', sans-serif;
+      color: white;
+      font-size: 44px;
+      letter-spacing: 3px;
+      margin: 12px 0 36px 0;
+      text-shadow: 0 4px 16px rgba(74, 59, 92, 0.22);
+    }
+
+    /* Clean 2-Column Balanced Grid */
+    .memories-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 760px) {
+      .memories-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* --- STACK CONTAINER STYLES --- */
+    .memory-stack {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* For text stacks (Poems, Letters, Notes): Expand full width horizontally */
+    .memory-stack.expanded:not(.photos-stack) {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .memory-stack.expanded:not(.photos-stack) .memory-card {
+      flex: 1 1 calc(50% - 10px);
+      min-width: 300px;
+      animation: popCardIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* For Photos Stack: Keeps latest photo fixed in place, older photos expand HORIZONTALLY to the side */
+    .memory-stack.photos-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      position: relative;
+    }
+
+    .memory-stack.photos-stack.expanded {
+      grid-column: 1 / -1; /* Spans full width so it doesn't push down other rows */
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+      z-index: 50;
+    }
+
+    .memory-stack.photos-stack.expanded .memory-card {
+      flex: 1 1 calc(33.333% - 14px);
+      min-width: 260px;
+      animation: popCardIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* Subtle layered card edges underneath collapsed stacks */
+    .memory-stack:not(.expanded) .memory-card:first-child::before,
+    .memory-stack:not(.expanded) .memory-card:first-child::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      z-index: -1;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+    }
+
+    .memory-stack:not(.expanded) .memory-card:first-child::before {
+      transform: translateY(8px) scale(0.975);
+    }
+
+    .memory-stack:not(.expanded) .memory-card:first-child::after {
+      transform: translateY(15px) scale(0.95);
+      z-index: -2;
+      background: rgba(255, 255, 255, 0.32);
+    }
+
+    /* Hide older cards until the stack is clicked */
+    .memory-stack:not(.expanded) .memory-card:not(:first-child) {
+      display: none;
+    }
+
+    /* Base Card Style (Clean Frosted Glass) */
+    .memory-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 26px 28px;
+      box-shadow: 0 10px 30px rgba(31, 38, 135, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      color: #2D2638;
+    }
+
+    .memory-stack .memory-card:first-child {
+      cursor: pointer;
+    }
+
+    .memory-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 36px rgba(74, 59, 92, 0.16);
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 10px;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(45deg, #B26CFF, #FF6082);
+    }
+
+    .stack-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: #5E4B73;
+      background: rgba(178, 108, 255, 0.1);
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(178, 108, 255, 0.25);
+      transition: background 0.2s ease;
+    }
+
+    .memory-stack .memory-card:first-child:hover .stack-badge {
+      background: rgba(178, 108, 255, 0.2);
+    }
+
+    .memory-card h2 {
+      font-family: 'dargirl', sans-serif;
+      margin: 0 0 14px 0;
+      color: #3D2E4F;
+      font-size: 28px;
+      font-weight: normal;
+    }
+
+    /* 1. Poem Container Styling */
+    .poem-card {
+      border-top: 4px solid #B26CFF;
+    }
+
+    .poem-body {
+      position: relative;
+      max-height: 250px;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .poem-body::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 55px;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.96));
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .poem-card.open .poem-body {
+      max-height: 2000px;
+    }
+
+    .poem-card.open .poem-body::after {
+      opacity: 0;
+    }
+
+    .poem-card p {
+      font-style: italic;
+      font-size: 15px;
+      line-height: 1.75;
+      white-space: pre-line;
+      color: #463E52;
+      margin: 0;
+      text-align: center;
+    }
+
+    .read-more-btn {
+      display: block;
+      margin: 14px auto 0 auto;
+      background: none;
+      border: 1px solid rgba(178, 108, 255, 0.35);
+      color: #7A49B8;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .read-more-btn:hover {
+      background: #B26CFF;
+      color: white;
+      border-color: #B26CFF;
+    }
+
+    /* 2. Scrapbook Polaroid Picture Card Styling */
+    .picture-card {
+      background: #FDFBF7;
+      padding: 20px;
+      border-top: 4px solid #619DC6;
+      text-align: center;
+      box-shadow: 0 12px 32px rgba(31, 38, 135, 0.12);
+    }
+
+    .picture-card .card-tag {
+      background: linear-gradient(45deg, #619DC6, #84B6D9);
+    }
+
+    .polaroid-wrapper {
+      position: relative;
+      background: #FFFFFF;
+      padding: 14px 14px 22px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+      margin-top: 12px;
+      cursor: pointer;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+    }
+
+    .polaroid-wrapper::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-1deg);
+      width: 90px;
+      height: 24px;
+      background: rgba(255, 243, 205, 0.7);
+      border: 1px dashed rgba(200, 180, 140, 0.5);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .polaroid-wrapper:hover {
+      transform: scale(1.03) translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .polaroid-wrapper img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+      margin-bottom: 12px;
+      transition: filter 0.2s ease;
+    }
+
+    .polaroid-wrapper:hover img {
+      filter: brightness(1.02);
+    }
+
+    .picture-caption {
+      font-family: 'mgf', 'dargirl', cursive;
+      font-size: 21px;
+      color: #4A5568;
+      margin: 0;
+    }
+
+    /* 3. Letters Stack */
+    .letter-card {
+      background: rgba(255, 252, 248, 0.94);
+      border-top: 4px solid #FF6082;
+    }
+
+    .letter-card .card-tag {
+      background: linear-gradient(45deg, #FF6082, #FF8E72);
+    }
+
+    .letter-card p {
+      line-height: 1.7;
+      font-size: 15px;
+      color: #4A3F45;
+      margin: 0 0 12px 0;
+    }
+
+    .letter-signoff {
+      font-family: 'dargirl', sans-serif;
+      font-size: 24px;
+      color: #FF6082;
+      text-align: right;
+      margin-top: 16px;
+    }
+
+    /* 4. Notes Stack */
+    .note-card {
+      background: linear-gradient(145deg, #FFFDF0 0%, #FFF7CC 100%);
+      border-top: 4px solid #F4C430;
+    }
+
+    .note-card .card-tag {
+      background: linear-gradient(45deg, #E5A91A, #F4C430);
+    }
+
+    .note-card p {
+      font-family: 'mgf', sans-serif;
+      font-size: 19px;
+      line-height: 1.6;
+      color: #4E4626;
+      margin: 0;
+    }
+
+    /* --- DIM BACKGROUND OVERLAY FOR STACKS --- */
+    .bg-dim-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 18, 30, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .bg-dim-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* --- LIGHTBOX ZOOM MODAL STYLING --- */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 18, 30, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      background: #FFFFFF;
+      padding: 18px 18px 28px 18px;
+      border-radius: 12px;
+      max-width: 90vw;
+      max-height: 90vh;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+    }
+
+    .lightbox-overlay.active .lightbox-content {
+      transform: scale(1);
+    }
+
+    .lightbox-content img {
+      max-width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 14px;
+    }
+
+    .lightbox-caption {
+      font-family: 'mgf', 'dargirl', cursive;
+      font-size: 24px;
+      color: #3D2E4F;
+      margin: 0;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      background: #FF6082;
+      color: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(255, 96, 130, 0.4);
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Universal background dimming overlay for stacks -->
+  <div class="bg-dim-overlay" id="bgDim"></div>
+
+  <header>
+    <h1 class="falling-text">
+      <span style="--i: 1">M</span>
+      <span style="--i: 2">Y</span>
+      <span style="--i: 3">&nbsp;</span>
+      <span style="--i: 4">M</span>
+      <span style="--i: 5">E</span>
+      <span style="--i: 6">M</span>
+      <span style="--i: 7">O</span>
+      <span style="--i: 8">R</span>
+      <span style="--i: 9">I</span>
+      <span style="--i: 10">E</span>
+      <span style="--i: 11">S</span>
+      <span style="--i: 12">&nbsp;</span>
+      <span style="--i: 13">W</span>
+      <span style="--i: 14">I</span>
+      <span style="--i: 15">T</span>
+      <span style="--i: 16">H</span>
+      <span style="--i: 17">&nbsp;</span>
+      <span style="--i: 18" class="yu">Y</span>
+      <span style="--i: 19" class="yu">U</span>
+    </h1>
+  </header>
+
+  <main>
+    <h1 class="love-banner">OURS</h1>
+
+    <div class="memories-grid">
+
+      <!-- 1. POEMS STACK -->
+      <div class="memory-stack" id="stack-poems">
+        <div class="memory-card poem-card">
+          <div class="card-header-row">
+            <span class="card-tag">Poem</span>
+            <span class="stack-badge"></span>
+          </div>
+          <h2>Forever&amp;</h2>
+          <div class="poem-body">
+            <p>On the way back home, 
+You hold my hand 
+We kiss at every stop
+On our lips it lands
+
+And when we cross the road,
+You make sure we’re safe,
+And I follow behind you,
+Wishing we could stay this way 
+
+And i’m writing out poems meant for you
+Looking at the sky, can’t believe it’s true 
+
+That I found love 
+I found love 
+You’re the one 
+I want forever 
+
+Your mother doesn’t approve,
+I feel inadequate 
+But your eyes are the proof
+That maybe I could be worth it
+
+Because i’m running round senseless over you
+Wake up at night, can’t believe it’s true
+
+That I found love 
+I found love 
+You’re the one 
+I want forever 
+You’re the one 
+Who knows my weather 
+And you’re the one 
+I want forever
+
+I do 
+Do you?
+I’d do 
+Anything for you
+I do 
+Won’t you? 
+Come over and tell me 
+That it’s just us two 
+
+Take me as I am 
+And i’ll take you as you are 
+I would wait forever for you 
+If you had to go somewhere far
+I would wait forever for you
+If you promise to keep my heart 
+And I would wait forever for you
+Like how I wished on every star
+
+That id find love
+Id find love 
+I’d find the one 
+And it’s you. I’ll want forever</p>
+          </div>
+          <button type="button" class="read-more-btn">Read full poem</button>
+        </div>
+
+        <div class="memory-card poem-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Poem</span>
+          </div>
+          <h2>Love</h2>
+          <div class="poem-body">
+            <p>Certainty
+Is what I see
+When I look at you and I
+To the future in our eyes
+
+I know I will never find another
+So I want this to be forever
+You are a diamond in disguise
+A shimmer in my eyes
+
+Shaken my heart from slumber
+From the belief we counts of number
+You made me fill my cup the most
+Even when the cup has holes
+
+The false belief of flashing lights
+Will make me fight for what stands right
+You were the one who got in my heart
+And that is not easy to draw it with art
+
+I carry the burden of a double edge sword that comes in desolate
+Living with a heart of uncertainty that makes this feel delicate
+Of my doubt that I battle every hour
+Vile, cannot compare to the purest of flower
+
+Everytime I wish to see the blue
+You show me the heart that makes me bloom
+On my life I believe that we won
+Uniform as our trust makes us one</p>
+          </div>
+          <button type="button" class="read-more-btn">Read full poem</button>
+        </div>
+      </div>
+
+      <!-- 2. PICTURES STACK (Latest stays fixed in place, older expand horizontally) -->
+      <div class="memory-stack photos-stack" id="stack-photos">
+        
+        <!-- 1st Photo (Most Recent - Stays in its grid slot) -->
+        <div class="memory-card picture-card">
+          <div class="card-header-row">
+            <span class="card-tag">Photos</span>
+            <span class="stack-badge"></span>
+          </div>
+          <div class="polaroid-wrapper" data-caption="Second Photobooth &lt;3">
+            <img src="SECBOOTH.jpg" alt="Second Photobooth">
+            <p class="picture-caption">Second Photobooth &lt;3</p>
+          </div>
+        </div>
+
+        <!-- 2nd Photo -->
+        <div class="memory-card picture-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Photos</span>
+          </div>
+          <div class="polaroid-wrapper" data-caption="Newest Date">
+            <img src="NEWDATE.jpg" alt="Newest Date">
+            <p class="picture-caption">Newest Date</p>
+          </div>
+        </div>
+
+        <!-- 3rd Photo -->
+        <div class="memory-card picture-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Photos</span>
+          </div>
+          <div class="polaroid-wrapper" data-caption="First Photobooth">
+            <img src="FIRBOOTH.jpg" alt="First Photobooth">
+            <p class="picture-caption">First Photobooth</p>
+          </div>
+        </div>
+
+        <!-- 4th Photo -->
+        <div class="memory-card picture-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Photos</span>
+          </div>
+          <div class="polaroid-wrapper" data-caption="First Date">
+            <img src="FIRDATE.jpg" alt="First Date">
+            <p class="picture-caption">First Date</p>
+          </div>
+        </div>
+
+        <!-- 5th Photo -->
+        <div class="memory-card picture-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Photos</span>
+          </div>
+          <div class="polaroid-wrapper" data-caption="Where it all started">
+            <img src="START.jpg" alt="Where it all started">
+            <p class="picture-caption">Where it all started</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 3. LETTERS STACK -->
+
+      <!-- 4. NOTES STACK -->
+      <div class="memory-stack" id="stack-notes">
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Quick Note</span>
+            <span class="stack-badge"></span>
+          </div>
+          <p>First sex tape / First shower - Nov Seventh</p>
+        </div>
+
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Note</span>
+          </div>
+          <p>First Sex - Oct Twenty</p>
+        </div>
+
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Note</span>
+          </div>
+          <p>First Love Letter (Ring) - Sep Thirty</p>
+        </div>
+
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Note</span>
+          </div>
+          <p>First Cream Puff - Sep Seventeen</p>
+        </div>
+
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Note</span>
+          </div>
+          <p>First Kiss - July Twenty Seven</p>
+        </div>
+
+        <div class="memory-card note-card">
+          <div class="card-header-row">
+            <span class="card-tag">Previous Note</span>
+          </div>
+          <p>Relationship Status - July Twenty Three</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- LIGHTBOX ZOOM MODAL CONTAINER -->
+  <div class="lightbox-overlay" id="lightbox">
+    <div class="lightbox-content">
+      <button type="button" class="lightbox-close" id="lightboxClose">&times;</button>
+      <img id="lightboxImg" src="" alt="Full view">
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+  </div>
+
+  <script>
+    const bgDim = document.getElementById('bgDim');
+
+    // Handle stack expanding/collapsing horizontally with background dimming
+    document.querySelectorAll('.memory-stack').forEach(stack => {
+      const cards = stack.querySelectorAll('.memory-card');
+      const topCard = cards[0];
+      const badge = topCard.querySelector('.stack-badge');
+      const olderCount = cards.length - 1;
+
+      if (olderCount > 0 && badge) {
+        badge.textContent = `+${olderCount} more`;
+
+        topCard.addEventListener('click', (e) => {
+          if (e.target.closest('.read-more-btn') || e.target.closest('.polaroid-wrapper')) return;
+
+          // Close other open stacks first
+          document.querySelectorAll('.memory-stack').forEach(s => {
+            if (s !== stack) s.classList.remove('expanded');
+          });
+
+          const isExpanded = stack.classList.toggle('expanded');
+          bgDim.classList.toggle('active', isExpanded);
+          badge.textContent = isExpanded ? 'Hide older' : `+${olderCount} more`;
+        });
+      } else if (badge) {
+        badge.style.display = 'none';
+      }
+    });
+
+    // Close expanded stacks when clicking the dimmed background
+    bgDim.addEventListener('click', () => {
+      document.querySelectorAll('.memory-stack').forEach(stack => {
+        stack.classList.remove('expanded');
+        const badge = stack.querySelector('.stack-badge');
+        const olderCount = stack.querySelectorAll('.memory-card').length - 1;
+        if (badge && olderCount > 0) {
+          badge.textContent = `+${olderCount} more`;
+        }
+      });
+      bgDim.classList.remove('active');
+    });
+
+    // Handle "Read full poem" button
+    document.querySelectorAll('.read-more-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.poem-card');
+        const isOpen = card.classList.toggle('open');
+        btn.textContent = isOpen ? 'Show less' : 'Read full poem';
+      });
+    });
+
+    // Lightbox Zoom Functionality for Photos (Stage 2 Click)
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    document.querySelectorAll('.polaroid-wrapper').forEach(wrapper => {
+      wrapper.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent stack toggle
+        const img = wrapper.querySelector('img');
+        const caption = wrapper.getAttribute('data-caption');
+
+        lightboxImg.src = img.src;
+        lightboxCaption.innerHTML = caption;
+        lightbox.classList.add('active');
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        bgDim.classList.remove('active');
+        document.querySelectorAll('.memory-stack').forEach(stack => {
+          stack.classList.remove('expanded');
+          const badge = stack.querySelector('.stack-badge');
+          const olderCount = stack.querySelectorAll('.memory-card').length - 1;
+          if (badge && olderCount > 0) {
+            badge.textContent = `+${olderCount} more`;
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
